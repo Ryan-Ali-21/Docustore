@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>DocuStore</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
+  </head>
+  <body>
+    <script>
+      function toggleModal(target,link){
+        elem = document.getElementById(target); 
+        elem.classList.toggle('is-active');
+        if(link){
+
+          field = document.getElementsByClassName('copy-link-input');
+          field[0].value = link
+          console.log(link);
+
+        }
+        
+      }
+      function uploadingAnimation(){
+
+        const form = document.getElementById("myform");
+        elem = document.getElementById("uploading"); 
+
+        form.addEventListener('submit', (event) => {
+          elem.style= "display:block";
+        });
+
+       
+      }
+      function delModal(itemName,itemID){
+        elem = document.getElementById("delModal"); 
+        elem.classList.toggle('is-active');
+        if(itemName){
+          file = document.getElementById("deleteFile"); 
+          file.value = itemName;
+          fileID = document.getElementById("deleteFileCosmos"); 
+          fileID.value = itemID;
+
+        }
+        
+      }
+      function setClipboard(){
+       
+        elem = document.getElementsByClassName('copy-link-input');
+        navigator.clipboard.writeText(elem[0].value);
+
+        button = document.getElementById("copyButton")
+        button.innerHTML = "Copied!";
+    setTimeout(() => (button.innerHTML = "Copy Link"), 1500);
+        console.log(elem[0].value);
+      }
+
+    </script>
+    <div class="content">
+    <h1>DocuStore</h1>
+    <p class="text has-text-weight-bold">Welcome to DocuStore
+      <br>
+      This is project is meant to test my understanding and implementation of the following technologies: Azure Functions, Azure CDN, CosmosDB, Azure Blob Storage <span class="material-icons">
+        info
+        </span>
+      <br>
+      <br>
+      File are deleted automatically after the expiration date has been exceeded
+    </p>
+    <div class="table-container">
+      <table class="table is-bordered is-striped is-hoverable is-fullwidth">
+        <thead>
+          <tr>
+            <th>File</th>
+            <th>Date</th>
+            <th>Expiration Date</th>
+            <th>Link</th>
+            <th>Delete File</th>
+            <th>Author</th>
+            <th>Tags</th>
+          </tr>
+        </th>
+        </thead>
+        <tbody>
+          <tr>
+            <td colspan="7" class="has-text-centered" onclick="toggleModal('upload')">Upload text file..</td>
+          </tr>
+          <!-- File row -->
+          <% for (var i=0;i<results.length;i++){ %>
+          <tr>
+            <th><%- results[i].fileName || "File Name" %></th>
+            <td><%- results[i].date || "Date" %></td>
+            <td><%- results[i].expDate || "Expiration Date" %></td>
+            <td onclick=toggleModal('link',"<%- results[i].link || 'Link' %>")>
+              <% if(!results[i].link) { %> 
+              <a>Create Link</a>
+              <% }  else { %>
+                <a>Get Link</a>
+                <% } %>
+              
+            </td>
+  
+            <td onclick='delModal("<%- results[i].fileName || 'File Name' %>","<%- results[i].id || 'File Name' %>")'>
+              <span class="material-icons is-size-5">
+                delete
+                </span> 
+              Delete File
+            </td>
+            <td><%- results[0].author || "Author" %></td>
+            <td style="display: flex;">
+  
+              <% for (var j =0;j<results[i].tags.length;j++){ %>
+                <div class="tag"><%- results[i].tags[j] %></div>
+                <% } %>
+  
+            </td>
+          </tr>
+          <% } %>
+      </tbody>
+      </table>
+    </div>
+
+    <!-- upload modal -->
+    <div id="upload" class="modal">
+      <div class="modal-background"></div>
+      <div class="modal-card">
+        <header class="modal-card-head">
+          <p class="modal-card-title title has-text-centered">Upload File</p>
+          <button class="delete" aria-label="close" onclick="toggleModal('upload')"></button>
+        </header>
+        <section class="modal-card-body" style="justify-content: center;display: flex;">
+          <!-- Content ... -->
+          <form id="myform" action="/" style="line-height: 3em;" method="post" enctype="multipart/form-data" >
+            <label class="text has-text-weight-bold" for="filename">File:</label>
+            <input type="file" name="filename" id="myFile" accept=".txt, .pdf" required>
+            <br>
+            <label class="text has-text-weight-bold" for="startDate"> Start Date:</label>
+            <input type="datetime-local" name="startDate" id="sDate" value="<%- date %>" min="<%- date %>" required>
+            <br>
+            <label class="text has-text-weight-bold" for="expDate">Expiration Date:</label>
+            <input type="datetime-local" name="expDate" id="expDate" value="<%- expDate %>" min="<%- expDate %>" required>
+            <br>
+            <label class="text has-text-weight-bold" for="author"> Author:</label>
+            <input type="text" name="author" id="author" placeholder="Enter your name here" required>
+            <br>
+            <label class="text has-text-weight-bold" for="tags"> Add Tags:</label>
+            <input type="text" name="tags" id="tags" placeholder="Tags are separated by ';'">
+          
+        </section>
+        <footer class="modal-card-foot" style="justify-content: center;">
+          <div class="buttons">
+            <input type="submit"  class="button is-success" value="Upload!" onclick="uploadingAnimation()">
+            <span id="uploading"  class="loader" style="display: none;"></span>
+          </input>
+            <input type="reset" class="button" onclick="toggleModal('upload')" value="Cancel"></input>
+          </div>
+        </form>
+        </footer>
+      </div>
+    </div>
+    <!-- Get Link Modal -->
+    <div id="link" class="modal">
+      <div class="modal-background"></div>
+      <div class="modal-card">
+        <header class="modal-card-head">
+          <p class="modal-card-title title has-text-centered">Share Link</p>
+          <button class="delete" aria-label="close" onclick="toggleModal('link')"></button>
+        </header>
+        <section class="modal-card-body">
+          <!-- Content ... -->
+          <div class="copy-link" style="justify-content: center;display: flex;">
+            <input type="text" class="copy-link-input" value="" style="width: 100%;" disabled readonly>
+          </div>
+        </section>
+        <footer class="modal-card-foot" style="justify-content: center;">
+          <div class="buttons">
+            <button id="copyButton" onclick="setClipboard()" class="button is-success">Copy Link</button>
+          </div>
+        </footer>
+      </div>
+    </div>
+    <!-- Delete Item modal -->
+    <div id="delModal" class="modal">
+      <div class="modal-background"></div>
+      <div class="modal-card">
+        <header class="modal-card-head">
+          <p class="modal-card-title title has-text-centered">Delete Item</p>
+          <button class="delete" aria-label="close" onclick="delModal()"></button>
+        </header>
+        <section class="modal-card-body">
+          <!-- Content ... -->
+         <div class="has-text-centered is-fullwidth" style="justify-content: center;display: flex;">
+            
+            <form action="/delete" method="post">
+              <p class="subtitle"> Are you sure you want to delete?</p>
+            <br>
+              <label class="text has-text-weight-bold" for="filename">File:</label>
+              <input type="text" name="fileName" id="deleteFile" style="width: 100%;" value="" readonly>
+              <br>
+              <br>
+              <label class="text has-text-weight-bold" for="fileID">File ID:</label>
+              <input type="text" name="fileID" id="deleteFileCosmos" value="" readonly>
+         </div>
+        </section>
+        <footer class="modal-card-foot" style="justify-content: center;">
+          <div class="buttons">
+            
+            <button class="button is-danger" type="submit"">Yes</button>
+            <button class="button" type="reset" onclick="delModal()">No</button>
+          </form>
+          </div>
+        </footer>
+      </div>
+    </div>
+  </div>
+  </body>
+</html>

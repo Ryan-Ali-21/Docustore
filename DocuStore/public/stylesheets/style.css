@@ -1,0 +1,78 @@
+@import "https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css";
+
+
+body {
+  padding: 5rem;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  height: 100vh;
+	width: auto;
+	align-items: center;
+  display: flex;
+	position: relative;
+  background: #ececec; 
+  justify-content: center;
+}
+
+
+
+.content{
+	padding: 1rem;
+	height: 85vh;
+	display: flex;
+	flex-direction: column;
+	width: 80%;
+	position: absolute;
+	border-radius: 5px;
+	color: #142d4c;
+	font-family:arial;
+  background: #9fd3c7; 
+  align-items: center;
+}
+
+
+
+.tag{
+  margin: 2px;
+  padding: 2px;
+  background-color: #385170;
+  border-radius: 2px;
+  color: #9fd3c7;
+
+}
+td{
+
+  cursor: pointer;
+
+}
+
+.loader {
+  width: 48px;
+  height: 48px;
+  display: inline-block;
+  position: relative;
+  border: 3px solid;
+  border-color:#2c2aa3f3 #0000 #128635; #0000;
+  border-radius: 50%;
+  box-sizing: border-box;
+  animation: 1s rotate linear infinite;
+}
+.loader:before , .loader:after{
+  content: '';
+  top: 0;
+  left: 0;
+  position: absolute;
+  border: 10px solid transparent;
+  border-bottom-color:#128635;
+  transform: translate(-10px, 19px) rotate(-35deg);
+}
+.loader:after {
+  border-color: #2c2aa3f3 #0000 #0000 #0000 ;
+  transform: translate(32px, 3px) rotate(-35deg);
+}
+ @keyframes rotate {
+  100%{    transform: rotate(360deg)}
+}
+
+
+
+
